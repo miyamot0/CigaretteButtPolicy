@@ -1,0 +1,335 @@
+---
+output: github_document
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE,
+                      dev = 'png',
+                      fig.path = 'plots/',
+                      dpi = 600)
+
+# Include for piping
+suppressPackageStartupMessages(library(dplyr))
+
+# Included for calculating FE CI's
+suppressPackageStartupMessages(library(emmeans))
+
+# Single-case plotting methods (MUST INSTALL FROM GITHUB, NOT CRAN)
+suppressPackageStartupMessages(library(fxl))
+
+# Methods for generating p-values
+suppressPackageStartupMessages(library(lmtest))
+
+# Methods for generating p-values
+suppressPackageStartupMessages(library(lmerTest))
+
+# Core fitting libraries
+suppressPackageStartupMessages(library(nlme))
+
+# Core fitting libraries
+suppressPackageStartupMessages(library(tidyr))
+
+# Read in data 
+dataSetSmoking = read.csv("cigbuttdata.csv")
+```
+
+## Tobacco-Free Policy Reduces Combustible Tobacco Byproduct on a Large University Campus
+
+Brett W. Gelino, Allyson R. Salzer, Joshua D. Harsin, Gideon P. Naudé
+
+University of Kansas, Cofrin Logan Center for Addiction Research & Treatment
+
+Shawn P. Gilroy
+
+Louisiana State University
+
+Derek D. Reed
+
+University of Kansas, Cofrin Logan Center for Addiction Research & Treatment
+
+## Abstract
+
+Recent years reflect an increase in public-campus adoption of tobacco-free regulation. Lower planning and implementation costs make campus-level policy a convenient proxy for broader public policy. Given the implications for community-level behavior change, demonstrating policy-level effects via behavior analytic planning is of value. The present study examines combustible tobacco-product refuse accumulation on a large university campus preceding and following the enactment of a tobacco-free policy. We compared waste across four sites flagged by preliminary surveying among campus faculty, staff, and students. Widely interpretable statistical testing suited for simple time-series research designs supplements visual analysis. Results suggest (a) a meaningful and sustained reduction of tobacco byproducts in all locations and (b) a demonstrative extension of behavior analytic evaluation to a policy with plausible community benefit. 
+
+## Cigarette Butt Dataset
+
+The dataset included here includes several variables, a list of each (and a snapshot of the dataset) are listed below:
+
+*Location*: Grouping variable, individual facet in plotted outcomes
+
+*Condition*: Dummy coded variable for intervention (0 = BL, 1 = TX)
+
+*Count*: The number of cigarette butts collected (DV)
+
+*Time*: Sequentially, the n months in which policy is/isn't in place
+
+*SC*: The slope change factors is dummy coded to reflect **non-baseline** trend differences (i.e., in intervention; just for Model IV)
+
+### Data Types
+
+```{r showData, echo=TRUE}
+str(dataSetSmoking)
+```
+
+### Data Preview
+
+```{r showData2, echo=TRUE}
+head(dataSetSmoking)
+```
+
+## Descriptive Illustration of Data
+
+Quick eye-balling of the data.
+
+```{r fxlDescriptives, echo=FALSE, fig.width=8}
+
+scr_plot(dataSetSmoking, aesthetics = list(x = Time,
+                                           y = Count,
+                                           p = Condition,
+                                           facet = Location),
+        mai = c(0.375, 0.375, 0.1, 0.1),
+        omi = c(0.25, 0.25, 0.25, 0.25)) %>%
+  scr_xoverride(c(1, 11)) %>%
+  scr_yoverride(list(
+    "1"    = list(y0 = 0,
+                  y1 = 100,
+                  yticks = c(0, 20, 40, 60, 80, 100)),
+    "2"    = list(y0 = 0,
+                  y1 = 100,
+                  yticks = c(0, 20, 40, 60, 80, 100)),
+    "3"    = list(y0 = 0,
+                  y1 = 500,
+                  yticks = c(0, 100, 200, 300, 400, 500)),
+    "4"    = list(y0 = 0,
+                  y1 = 200,
+                  yticks = c(0, 50, 100, 150, 200))),
+    ydelta = 50) %>%
+  scr_points(cex = 2) %>%
+  scr_lines() %>%
+  scr_label_phase(facet = "1",
+                  cex    = 1.25,
+                  adj    = 0.5,
+                  y      = 100,
+                  labels = list(
+                    "Pre-Policy"     = list(x = 2),
+                    "Policy Enacted" = list(x = 5)
+                  )) %>%
+  scr_label_facet(cex = 1.5,
+                  adj = 1,
+                  x   = 11,
+                  labels = list(
+                    "1" = list(y = 100, label = "Location A"),
+                    "2" = list(y = 100, label = "Location B"),
+                    "3" = list(y = 500, label = "Location C"),
+                    "4" = list(y = 200, label = "Location D")
+                  )) %>%
+  scr_plines_mbd(lines = list(
+    "A" = list(
+      "1" = list(x1 = 3.5, y1 = 100),
+      "2" = list(x1 = 3.5, y1 = 100),
+      "3" = list(x1 = 3.5, y1 = 500),
+      "4" = list(x1 = 3.5, y1 = 200)
+    )
+  )) %>%
+  scr_xlabel("Collection Period") %>%
+  scr_ylabel("Cigarette Butts Collected")
+
+```
+
+## Analytical Strategy
+
+- Step 1) Select a GLS model candidate per the Huitema & McKean time series approach (III/IV)
+
+- Step 2) Confirm that an OLS equivalent to optimal GLS model fails assumptions
+
+- Step 3) Evaluate whether random effects are warranted for optimal GLS Model
+
+### Step 1) Model Candidates
+
+Huitema & McKean (HM) presented 4 different modeling strategies to characterize times-series data. Generally, there are two models (i.e., phase level alone, phase level and trend) evaluated with and without addressing autocorrelated errors. Broadly, HM noted that you can evaluate all 4 or just focus on the two that model autocorrelated errors (i.e., Model III [Trend Change], Model IV [Trend + Slope Change]). 
+
+#### Model IV
+
+```{r modelIV}
+modelIV = gls(Count ~ Time + Condition + SC,
+              correlation = corAR1(form = ~ Time | Location),
+              control = glsControl(
+                maxIter = 1000,
+                msMaxIter = 1000,
+                opt = "optim"
+              ),
+              method = "ML",
+              data = dataSetSmoking)
+
+summary(modelIV)
+```
+
+#### Model III
+
+```{r modelIII}
+modelIII = gls(Count ~ Condition,
+              correlation = corAR1(form = ~ Time | Location),
+              control = glsControl(
+                maxIter = 1000,
+                msMaxIter = 1000,
+                opt = "optim"
+              ),
+              method = "ML",
+              data = dataSetSmoking)
+
+summary(modelIII)
+```
+
+#### Model Comparisons
+
+The HM models can be compared directly using common methods, i.e. Likelihood Ratio Test (LRT). Briefly, assuming fits by Maximum Likelihood, the two can be compared in terms of likelihood (H0 = simpler is better).
+
+Using the LRT included in *nlme* (override of *anova* function), the fits are as follows:
+
+```{r lrt}
+
+anova(modelIV, modelIII)
+
+```
+
+Conclusion: *there is insufficient evidence to reject the null hypothesis that the simpler model [Phase Differences alone] is better.*
+
+### Step 2) Justify Generalized Least Squares
+
+Model I is the OLS complement to Model III (GLS). Model I is fitted here to examine whether the residuals appear randomly distributed.
+
+```{r testAssumptions}
+
+modelII = lm(Count ~ Condition,
+            data = dataSetSmoking)
+
+dwtest(modelII, alternative = "two.sided")
+
+```
+
+Conclusion: *Significant autocorrelation present and residuals do not appear randomly distributed around 0.* Model III is the way to go.
+
+### Step 3) Evaluate Utility of Random Effects
+
+```{r randomEffects}
+
+modelIIIre = lme(Count ~ Condition,
+                 random = ~ 1 | Location,
+                 correlation = corAR1(form = ~ Time | Location),
+                 method = "ML",
+                 data = dataSetSmoking)
+
+anova(modelIII, modelIIIre)
+
+```
+
+Conclusion: *there is insufficient evidence to reject the null hypothesis that the simpler model [Phase Differences alone without random effects] is better*.
+
+## Results
+
+```{r finalResults}
+
+summary(modelIII)
+
+```
+
+```{r finalFig, fig.height=6, fig.width=8, echo=FALSE}
+
+dataSetSmoking$yhat = predict(modelIII)
+
+newFrame = pivot_wider(dataSetSmoking, 
+                       names_from = Location,
+                       values_from = Count) %>%
+  rename(Count1 = `1`,
+         Count2 = `2`,
+         Count3 = `3`,
+         Count4 = `4`) %>%
+  mutate(Facet = 1) %>%
+  as.data.frame()
+
+scr_plot(newFrame, aesthetics = list(x = Time,
+                                     y = Count1,
+                                     p = Condition,
+                                     facet = Facet),
+        mai = c(0.5, 0.5, 0, 0),
+        omi = c(0.25, 0.25, 0, 0)) %>%
+  scr_xoverride(c(1, 11)) %>%
+  scr_yoverride(c(0, 500),
+                ydelta = 50) %>%
+  scr_lines() %>%
+  scr_points(cex = 2,
+             pch = 21,
+             fill = 'gray') %>%
+  scr_points(cex = 2,
+             pch = 22,
+             mapping = list(x = Time,
+                            y = Count2,
+                            p = Condition)) %>%
+  scr_lines(mapping = list(x = Time,
+                            y = Count2,
+                            p = Condition)) %>%
+  scr_points(cex = 2,
+             pch = 23,
+             mapping = list(x = Time,
+                            y = Count3,
+                            p = Condition)) %>%
+  scr_lines(mapping = list(x = Time,
+                            y = Count3,
+                            p = Condition)) %>%
+  scr_lines(mapping = list(x = Time,
+                            y = Count4,
+                            p = Condition)) %>%
+  scr_points(cex = 2,
+             pch = 24,
+             fill = 'gray',
+             mapping = list(x = Time,
+                            y = Count4,
+                            p = Condition)) %>%
+  scr_lines(size = 1,
+            mapping = list(x = Time,
+                           y = yhat,
+                           p = Condition),
+            color = "red") %>%
+  scr_label_phase(facet = "1",
+                  cex    = 1.25,
+                  adj    = 0.5,
+                  y      = 500,
+                  labels = list(
+                    "Pre-Policy"     = list(x = 2),
+                    "Policy Enacted" = list(x = 5)
+                  )) %>%
+  scr_plines(
+    lty = 1,
+    lines = list(
+      "1" = list(
+        "A" = list(
+          x1 = 3.5,
+          y1 = 525
+        )
+      )
+  )) %>%
+  scr_xlabel("Collection Period") %>%
+  scr_ylabel("Cigarette Butts Collected") %>%
+  scr_legend(panel    = "1",
+             position = "topright",
+             legend   = c("Location A", 
+                          "Location B",
+                          "Location C",
+                          "Location D"),
+             col      = c('black', 'black', 'black', 'black'),
+             pt.bg    = c('gray', 'black', 'black', 'gray'),
+             lty      = c(1, 1, 1, 1),
+             pch      = c(21, 22 ,23, 24),
+             bg       = c('black', 'black', 'black', 'black'),
+             bty      = "n",
+             pt.cex   = 2,
+             cex      = 1.25,
+             text.col = "black",
+             horiz    = F,
+             box.lty  = 0)
+
+```
+
+
+
+Takeaways: The overall baseline (Intercept) level was ~159 cigarette butts counted on site overall prior to the policy change. Following the introduction of the policy, overall, there was a -124 change in the level of cigarette butts counted across sites (`r round(((124)/159)*100, 2)` percent decrease).

@@ -1,35 +1,4 @@
 
-``` r
-knitr::opts_chunk$set(echo = TRUE,
-                      dev = 'png',
-                      fig.path = 'plots/',
-                      dpi = 600)
-
-# Include for piping
-suppressPackageStartupMessages(library(dplyr))
-
-# Included for calculating FE CI's
-suppressPackageStartupMessages(library(emmeans))
-
-# Single-case plotting methods (MUST INSTALL FROM GITHUB, NOT CRAN)
-suppressPackageStartupMessages(library(fxl))
-
-# Methods for generating p-values
-suppressPackageStartupMessages(library(lmtest))
-
-# Methods for generating p-values
-suppressPackageStartupMessages(library(lmerTest))
-
-# Core fitting libraries
-suppressPackageStartupMessages(library(nlme))
-
-# Core fitting libraries
-suppressPackageStartupMessages(library(tidyr))
-
-# Read in data 
-dataSetSmoking = read.csv("cigbuttdata.csv")
-```
-
 ## Tobacco-Free Policy Reduces Combustible Tobacco Byproduct on a Large University Campus
 
 Brett W. Gelino, Allyson R. Salzer, Joshua D. Harsin, Gideon P. Naudé
@@ -62,6 +31,37 @@ designs supplements visual analysis. Results suggest (a) a meaningful
 and sustained reduction of tobacco byproducts in all locations and (b) a
 demonstrative extension of behavior analytic evaluation to a policy with
 plausible community benefit.
+
+``` r
+knitr::opts_chunk$set(echo = TRUE,
+                      dev = 'png',
+                      fig.path = 'plots/',
+                      dpi = 600)
+
+# Include for piping
+suppressPackageStartupMessages(library(dplyr))
+
+# Included for calculating FE CI's
+suppressPackageStartupMessages(library(emmeans))
+
+# Single-case plotting methods (MUST INSTALL FROM GITHUB, NOT CRAN)
+suppressPackageStartupMessages(library(fxl))
+
+# Methods for generating p-values
+suppressPackageStartupMessages(library(lmtest))
+
+# Methods for generating p-values
+suppressPackageStartupMessages(library(lmerTest))
+
+# Core fitting libraries
+suppressPackageStartupMessages(library(nlme))
+
+# Core fitting libraries
+suppressPackageStartupMessages(library(tidyr))
+
+# Read in data 
+dataSetSmoking = read.csv("cigbuttdata.csv")
+```
 
 ## Cigarette Butt Dataset
 

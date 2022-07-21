@@ -2,6 +2,24 @@
 output: github_document
 ---
 
+## Tobacco-Free Policy Reduces Combustible Tobacco Byproduct on a Large University Campus
+
+Brett W. Gelino, Allyson R. Salzer, Joshua D. Harsin, Gideon P. Naudé
+
+University of Kansas, Cofrin Logan Center for Addiction Research & Treatment
+
+Shawn P. Gilroy
+
+Louisiana State University
+
+Derek D. Reed
+
+University of Kansas, Cofrin Logan Center for Addiction Research & Treatment
+
+## Abstract
+
+Recent years reflect an increase in public-campus adoption of tobacco-free regulation. Lower planning and implementation costs make campus-level policy a convenient proxy for broader public policy. Given the implications for community-level behavior change, demonstrating policy-level effects via behavior analytic planning is of value. The present study examines combustible tobacco-product refuse accumulation on a large university campus preceding and following the enactment of a tobacco-free policy. We compared waste across four sites flagged by preliminary surveying among campus faculty, staff, and students. Widely interpretable statistical testing suited for simple time-series research designs supplements visual analysis. Results suggest (a) a meaningful and sustained reduction of tobacco byproducts in all locations and (b) a demonstrative extension of behavior analytic evaluation to a policy with plausible community benefit. 
+
 ```{r setup}
 knitr::opts_chunk$set(echo = TRUE,
                       dev = 'png',
@@ -32,24 +50,6 @@ suppressPackageStartupMessages(library(tidyr))
 # Read in data 
 dataSetSmoking = read.csv("cigbuttdata.csv")
 ```
-
-## Tobacco-Free Policy Reduces Combustible Tobacco Byproduct on a Large University Campus
-
-Brett W. Gelino, Allyson R. Salzer, Joshua D. Harsin, Gideon P. Naudé
-
-University of Kansas, Cofrin Logan Center for Addiction Research & Treatment
-
-Shawn P. Gilroy
-
-Louisiana State University
-
-Derek D. Reed
-
-University of Kansas, Cofrin Logan Center for Addiction Research & Treatment
-
-## Abstract
-
-Recent years reflect an increase in public-campus adoption of tobacco-free regulation. Lower planning and implementation costs make campus-level policy a convenient proxy for broader public policy. Given the implications for community-level behavior change, demonstrating policy-level effects via behavior analytic planning is of value. The present study examines combustible tobacco-product refuse accumulation on a large university campus preceding and following the enactment of a tobacco-free policy. We compared waste across four sites flagged by preliminary surveying among campus faculty, staff, and students. Widely interpretable statistical testing suited for simple time-series research designs supplements visual analysis. Results suggest (a) a meaningful and sustained reduction of tobacco byproducts in all locations and (b) a demonstrative extension of behavior analytic evaluation to a policy with plausible community benefit. 
 
 ## Cigarette Butt Dataset
 

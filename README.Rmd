@@ -22,7 +22,7 @@ Recent years reflect an increase in public-campus adoption of tobacco-free regul
 
 ```{r setup}
 knitr::opts_chunk$set(echo = TRUE,
-                      dev = 'png',
+                      dev = 'svg',
                       fig.path = 'plots/',
                       dpi = 600)
 
@@ -31,6 +31,10 @@ suppressPackageStartupMessages(library(dplyr))
 
 # Included for calculating FE CI's
 suppressPackageStartupMessages(library(emmeans))
+
+# Included for font change
+# Note: Using Open Sans font
+suppressPackageStartupMessages(library(extrafont))
 
 # Single-case plotting methods (MUST INSTALL FROM GITHUB, NOT CRAN)
 suppressPackageStartupMessages(library(fxl))
@@ -87,8 +91,9 @@ scr_plot(dataSetSmoking, aesthetics = list(x = Time,
                                            y = Count,
                                            p = Condition,
                                            facet = Location),
-        mai = c(0.375, 0.375, 0.1, 0.1),
-        omi = c(0.25, 0.25, 0.25, 0.25)) %>%
+        mai = c(0.375, 0.425, 0.1, 0.1),
+        omi = c(0.25, 0.25, 0.25, 0.25),
+        family = "Open Sans") %>%
   scr_xoverride(c(1, 11)) %>%
   scr_yoverride(list(
     "1"    = list(y0 = 0,
@@ -251,8 +256,9 @@ scr_plot(newFrame, aesthetics = list(x = Time,
                                      y = Count1,
                                      p = Condition,
                                      facet = Facet),
-        mai = c(0.5, 0.5, 0, 0),
-        omi = c(0.25, 0.25, 0, 0)) %>%
+        mai = c(0.5, 0.55, 0, 0),
+        omi = c(0.25, 0.25, 0, 0),
+        family = "Open Sans") %>%
   scr_xoverride(c(1, 11)) %>%
   scr_yoverride(c(0, 500),
                 ydelta = 50) %>%

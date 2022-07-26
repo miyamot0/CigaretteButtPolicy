@@ -34,7 +34,7 @@ plausible community benefit.
 
 ``` r
 knitr::opts_chunk$set(echo = TRUE,
-                      dev = 'png',
+                      dev = 'svg',
                       fig.path = 'plots/',
                       dpi = 600)
 
@@ -43,6 +43,9 @@ suppressPackageStartupMessages(library(dplyr))
 
 # Included for calculating FE CI's
 suppressPackageStartupMessages(library(emmeans))
+
+# Included for font change
+suppressPackageStartupMessages(library(extrafont))
 
 # Single-case plotting methods (MUST INSTALL FROM GITHUB, NOT CRAN)
 suppressPackageStartupMessages(library(fxl))
@@ -111,7 +114,7 @@ head(dataSetSmoking)
 
 Quick eye-balling of the data.
 
-![](plots/fxlDescriptives-1.png)<!-- -->
+![](plots/fxlDescriptives-1.svg)<!-- -->
 
 ## Analytical Strategy
 
@@ -323,7 +326,7 @@ summary(modelIII)
     ## Residual standard error: 92.82478 
     ## Degrees of freedom: 44 total; 42 residual
 
-![](plots/finalFig-1.png)<!-- -->
+![](plots/finalFig-1.svg)<!-- -->
 
 Takeaways: The overall baseline (Intercept) level was \~159 cigarette
 butts counted on site overall prior to the policy change. Following the

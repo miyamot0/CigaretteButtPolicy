@@ -45,6 +45,7 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(emmeans))
 
 # Included for font change
+# Note: Using Open Sans font
 suppressPackageStartupMessages(library(extrafont))
 
 # Single-case plotting methods (MUST INSTALL FROM GITHUB, NOT CRAN)
